@@ -1,0 +1,4 @@
+[submodule "CUSTIS.i18n"]
+	path = CUSTIS.i18n
+	url = https://github.com/CUSTIS-public/CUSTIS.i18n.git
+	branch = master
