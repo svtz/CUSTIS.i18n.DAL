@@ -79,7 +79,7 @@ namespace CUSTIS.I18N.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Начальными культуры в цепочках должны быть уникальными..
+        ///   Looks up a localized string similar to Начальные культуры в цепочках должны быть уникальными..
         /// </summary>
         internal static string ChainsFallbackFirstCultureMustBeUniqueMessage {
             get {

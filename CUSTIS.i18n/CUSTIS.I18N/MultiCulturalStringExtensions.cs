@@ -79,7 +79,8 @@ namespace CUSTIS.I18N
         /// <summary> 
         /// Получить значение в культуре <paramref name="culture"/> с использованием <paramref name="resourceFallbackProcess"/>. 
         /// </summary>
-        public static string ToLocalizedString(this string source, IResourceFallbackProcess resourceFallbackProcess, CultureInfo culture)
+        public static string ToLocalizedString(this string source, IResourceFallbackProcess resourceFallbackProcess,
+            CultureInfo culture)
         {
             return source.AsMultiCulturalString().GetString(resourceFallbackProcess, culture);
         }
@@ -88,7 +89,8 @@ namespace CUSTIS.I18N
         /// Получить значение в культуре <paramref name="culture"/>. 
         /// Если <paramref name="useFallback"/> == <c>true</c>, то с использованием <paramref name="resourceFallbackProcess"/>. 
         /// </summary>
-        public static string ToLocalizedString(this string source, IResourceFallbackProcess resourceFallbackProcess, CultureInfo culture, bool useFallback)
+        public static string ToLocalizedString(this string source, IResourceFallbackProcess resourceFallbackProcess,
+            CultureInfo culture, bool useFallback)
         {
             return source.AsMultiCulturalString().ToString(resourceFallbackProcess, culture, useFallback);
         }

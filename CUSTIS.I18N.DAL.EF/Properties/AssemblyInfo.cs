@@ -3,10 +3,10 @@ using System.Reflection;
 using System.Resources;
 using System.Runtime.InteropServices;
 
-[assembly: AssemblyTitle("CUSTIS.I18N")]
-[assembly: AssemblyDescription("Поддержка глобализации и локализации")]
+[assembly: AssemblyTitle("CUSTIS.I18N.SampleDomainModel.DAL.EF")]
+[assembly: AssemblyDescription("DAL на EntityFramework для тестовой доменной модели")]
 [assembly: AssemblyConfiguration("")]
 [assembly: ComVisible(false)]
-[assembly: Guid("89f13902-f5d3-4336-a12a-4ef462f0295f")]
+[assembly: Guid("d5c7fd37-0ad4-4925-88a1-c7651db64e69")]
 [assembly: CLSCompliant(true)]
 [assembly: NeutralResourcesLanguage("ru")]

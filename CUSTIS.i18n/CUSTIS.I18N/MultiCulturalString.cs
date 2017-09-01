@@ -16,13 +16,11 @@ namespace CUSTIS.I18N
     [Serializable]
     public sealed class MultiCulturalString : IFormattable, ISerializable
     {
-
         #region Поля
 
         private readonly Dictionary<string, string> _localizedStrings;
 
         #endregion
-
 
         #region Конструкторы
 
@@ -40,7 +38,7 @@ namespace CUSTIS.I18N
         /// </remarks>
         public MultiCulturalString(IEnumerable<KeyValuePair<CultureInfo, string>> localizedStrings)
         {
-            var sourceStrings = localizedStrings ?? new KeyValuePair<CultureInfo, string>[] { };
+            var sourceStrings = localizedStrings ?? new KeyValuePair<CultureInfo, string>[] {};
 
             _localizedStrings = sourceStrings
                 .Where(kvp => kvp.Value != null)
@@ -70,15 +68,14 @@ namespace CUSTIS.I18N
             Contract.Requires(culture != null);
 
             _localizedStrings = value != null
-                                    ? new Dictionary<string, string>
-                                        {
-                                            {culture.Name, value}
-                                        }
-                                    : new Dictionary<string, string>();
+                ? new Dictionary<string, string>
+                {
+                    {culture.Name, value}
+                }
+                : new Dictionary<string, string>();
         }
 
         #endregion
-
 
         #region Сериализация
 
@@ -100,7 +97,6 @@ namespace CUSTIS.I18N
         }
 
         #endregion
-
 
         #region Строковые методы
 
@@ -163,7 +159,8 @@ namespace CUSTIS.I18N
         /// Это значит, что объекты, поддерживающие для форматирования <see cref="LocalizationFormatInfo"/> (многоязычные строки, возможно, другие типы) будут представлены 
         /// в культуре <c>culture</c>, а стандартные типы (числа, даты) будут форматироваться <paramref name="formatProvider"/>.
         /// </remarks>
-        public static MultiCulturalString Format(IFormatProvider formatProvider, MultiCulturalString formatString, params object[] args)
+        public static MultiCulturalString Format(IFormatProvider formatProvider, MultiCulturalString formatString,
+            params object[] args)
         {
             Contract.Requires(formatString != null);
             Contract.Requires(args != null);
@@ -209,7 +206,7 @@ namespace CUSTIS.I18N
         {
             Contract.Requires(culture != null);
             Contract.Ensures(Contract.Result<MultiCulturalString>() != null);
-            
+
             var newData = _localizedStrings
                 .ToDictionary(pair => CultureInfo.GetCultureInfo(pair.Key), pair => pair.Value);
             if (localizedString != null)
@@ -248,8 +245,8 @@ namespace CUSTIS.I18N
                 resultDictionary[kvp.Key] = kvp.Value;
             }
             return new MultiCulturalString(resultDictionary.Select(kvp =>
-                                                                  new KeyValuePair<CultureInfo, string>(
-                                                                      CultureInfo.GetCultureInfo(kvp.Key), kvp.Value)));
+                new KeyValuePair<CultureInfo, string>(
+                    CultureInfo.GetCultureInfo(kvp.Key), kvp.Value)));
         }
 
         /// <summary> Присутствует ли в данном экземпляре строка с заданной культурой. </summary>
@@ -338,9 +335,8 @@ namespace CUSTIS.I18N
 
         #endregion
 
-
         #region Перегрузки ToString(), GetString()
-        
+
         private string DebuggerDisplay
         {
             get
@@ -354,22 +350,22 @@ namespace CUSTIS.I18N
                     const int maxLength = 10;
                     var formattedStrings = _localizedStrings
                         .Select(p => string.Format(mainFormat, p.Key,
-                                                   p.Value != string.Empty
-                                                       ? p.Value.Substring(0, Math.Min(maxLength, p.Value.Length))
-                                                       : "(string.Empty)"));
+                            p.Value != string.Empty
+                                ? p.Value.Substring(0, Math.Min(maxLength, p.Value.Length))
+                                : "(string.Empty)"));
 
                     if (_localizedStrings.Count > threshold)
                     {
                         return string.Join(separator,
-                                           formattedStrings
-                                               .Take(threshold)
-                                               .Concat(new[]
-                                                   {string.Format(countFormat, _localizedStrings.Count)}));
+                            formattedStrings
+                                .Take(threshold)
+                                .Concat(new[]
+                                    {string.Format(countFormat, _localizedStrings.Count)}));
                     }
                     else
                     {
                         return string.Join(separator,
-                                           formattedStrings);
+                            formattedStrings);
                     }
                 }
                 else
@@ -648,22 +644,21 @@ namespace CUSTIS.I18N
                 : null;
         }
 
-/// <summary> Строковое представление, реализация <see cref="IFormattable"/>. </summary>
-/// <param name="format">Строка пользовательского формата. Не используется. </param>
-/// <param name="formatProvider">Провайдер форматирования. Используется для получения культуры строки, resourceFallbackProcess. 
-/// Информация м.б. получена из <see cref="LocalizationFormatInfo"/> или <see cref="CultureInfo"/>. </param>
-/// <returns></returns>
-string IFormattable.ToString(string format, IFormatProvider formatProvider)
-{
-    Contract.Ensures(Contract.Result<string>() != null);
+        /// <summary> Строковое представление, реализация <see cref="IFormattable"/>. </summary>
+        /// <param name="format">Строка пользовательского формата. Не используется. </param>
+        /// <param name="formatProvider">Провайдер форматирования. Используется для получения культуры строки, resourceFallbackProcess. 
+        /// Информация м.б. получена из <see cref="LocalizationFormatInfo"/> или <see cref="CultureInfo"/>. </param>
+        /// <returns></returns>
+        string IFormattable.ToString(string format, IFormatProvider formatProvider)
+        {
+            Contract.Ensures(Contract.Result<string>() != null);
 
-    var formatInfo = LocalizationFormatInfo.GetInstance(formatProvider);
+            var formatInfo = LocalizationFormatInfo.GetInstance(formatProvider);
 
-    return ToString(formatInfo.Culture ?? CultureInfo.CurrentUICulture, formatInfo.UseFallback);
-}
+            return ToString(formatInfo.Culture ?? CultureInfo.CurrentUICulture, formatInfo.UseFallback);
+        }
 
         #endregion
-
 
         #region Свойства
 
@@ -672,10 +667,7 @@ string IFormattable.ToString(string format, IFormatProvider formatProvider)
         /// <summary> Fallback, используемый в многоязычных строках по умолчанию. </summary>
         private static IResourceFallbackProcess DefaultResourceFallbackProcess
         {
-            get
-            {
-                return GlobalizationSettings.Current.MultiCulturalStringResourceFallbackProcess;
-            }
+            get { return GlobalizationSettings.Current.MultiCulturalStringResourceFallbackProcess; }
         }
 
         /// <summary> Возвращает многоязычную строку, которая не содержит значения ни для какой культуры.</summary>
@@ -699,23 +691,16 @@ string IFormattable.ToString(string format, IFormatProvider formatProvider)
         /// <summary> Является ли мультикультурная строка пустой? </summary>
         public bool IsEmpty
         {
-            get
-            {
-                return _localizedStrings.All(pair => string.IsNullOrEmpty(pair.Value));
-            }
+            get { return _localizedStrings.All(pair => string.IsNullOrEmpty(pair.Value)); }
         }
 
         /// <summary> Содержит ли строка только пустые или непечатаемые значения? </summary>
         public bool IsWhiteSpace
         {
-            get
-            {
-                return _localizedStrings.All(pair => string.IsNullOrWhiteSpace(pair.Value));
-            }
+            get { return _localizedStrings.All(pair => string.IsNullOrWhiteSpace(pair.Value)); }
         }
 
         #endregion
-
 
         #region Сравнение
 
@@ -738,11 +723,10 @@ string IFormattable.ToString(string format, IFormatProvider formatProvider)
         {
             return _localizedStrings
                 .Aggregate(0, (current, localizedString) =>
-                              current ^ localizedString.Key.GetHashCode() + localizedString.Value.GetHashCode());
+                    current ^ localizedString.Key.GetHashCode() + localizedString.Value.GetHashCode());
         }
 
         #endregion
-
 
         #region Проверки
 

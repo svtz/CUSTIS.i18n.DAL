@@ -1,8 +1,5 @@
-CUSTIS.I18N/obj/
-CUSTIS.I18N.Tests/
-CUSTIS.I18N.Tests/obj/
-CUSTIS.I18N.Tests/bin/
-CUSTIS.I18N/bin/
+bin/
+obj/
 packages/
 .vs/
-
+*.user

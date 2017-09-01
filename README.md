@@ -1,2 +1,2 @@
-# CUSTIS.i18n
-CUSTIS.i18n - Multicultural strings support. See https://habrahabr.ru/company/custis/blog/313284/ (in Russian).
+# CUSTIS.i18n.DAL
+CUSTIS.i18n.DAL - Multicultural DAL support. See https://habrahabr.ru/company/custis/blog/313690/ (in Russian).

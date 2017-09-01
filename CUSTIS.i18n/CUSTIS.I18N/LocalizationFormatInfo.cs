@@ -42,6 +42,7 @@ namespace CUSTIS.I18N
         {
             get { return _culture; }
         }
+
         private readonly CultureInfo _culture;
 
         /// <summary> Провайдер других форматов. Может быть <see langword="null"/>. </summary>
@@ -49,6 +50,7 @@ namespace CUSTIS.I18N
         {
             get { return _provider; }
         }
+
         private readonly IFormatProvider _provider;
 
         /// <summary> Использовать ли fallback process. По умолчанию - <see langword="true"/>. </summary>
@@ -56,6 +58,7 @@ namespace CUSTIS.I18N
         {
             get { return _useFallback; }
         }
+
         private readonly bool _useFallback;
 
         /// <summary> 
@@ -78,7 +81,7 @@ namespace CUSTIS.I18N
         /// <summary> Создает копию текущего экземпляра.</summary>
         public object Clone()
         {
-            return (LocalizationFormatInfo)MemberwiseClone();
+            return (LocalizationFormatInfo) MemberwiseClone();
         }
     }
 }

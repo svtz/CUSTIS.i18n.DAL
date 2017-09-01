@@ -3,11 +3,10 @@ using System.Reflection;
 using System.Resources;
 using System.Runtime.InteropServices;
 
-[assembly: AssemblyTitle("CUSTIS.I18N")]
-[assembly: AssemblyDescription("Поддержка глобализации и локализации")]
+[assembly: AssemblyTitle("CUSTIS.I18N.SampleDomainModel.Tests.NH")]
+[assembly: AssemblyDescription("Тесты для DAL NH на базе CUSTIS.I18N.SampleDomainModel")]
 [assembly: AssemblyConfiguration("")]
 [assembly: ComVisible(false)]
-
-[assembly: Guid("89f13902-f5d3-4336-a12a-4ef462f0295f")]
+[assembly: Guid("40e023e3-8e02-422e-b0d7-767fdfb5a739")]
 [assembly: CLSCompliant(true)]
 [assembly: NeutralResourcesLanguage("ru")]

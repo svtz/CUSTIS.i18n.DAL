@@ -77,13 +77,12 @@ namespace CUSTIS.I18N
                 }
                 else
                 {
-                    return new [] { initial };
+                    return new[] {initial};
                 }
             }
         }
 
         #endregion
-
 
         #region Object implementation
 
@@ -135,10 +134,10 @@ namespace CUSTIS.I18N
 
         #endregion
 
-
         #region Внутренние методы
 
-        private void InitializeChains(IEnumerable<string[]> cultureChains, out Dictionary<CultureInfo, CultureInfo[]> chains, out CultureInfo[] defaultChain)
+        private void InitializeChains(IEnumerable<string[]> cultureChains,
+            out Dictionary<CultureInfo, CultureInfo[]> chains, out CultureInfo[] defaultChain)
         {
             // Проверяем уникальность первых культур 
             var allChains = cultureChains
@@ -163,14 +162,14 @@ namespace CUSTIS.I18N
             }
 
             chains = allChains.Where(ch => ch.Key != AnyCultureSymbol)
-                              .ToDictionary(c => CultureInfo.GetCultureInfo(c.Key),
-                                            c => c.Value.Select(CultureInfo.GetCultureInfo).ToArray());
+                .ToDictionary(c => CultureInfo.GetCultureInfo(c.Key),
+                    c => c.Value.Select(CultureInfo.GetCultureInfo).ToArray());
 
             defaultChain = anyCultureChains.Any()
-                               ? anyCultureChains.SingleOrDefault().Value
-                                                 .Select(CultureInfo.GetCultureInfo)
-                                                 .ToArray()
-                               : null;
+                ? anyCultureChains.SingleOrDefault().Value
+                    .Select(CultureInfo.GetCultureInfo)
+                    .ToArray()
+                : null;
         }
 
         #endregion
