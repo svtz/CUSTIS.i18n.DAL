@@ -271,10 +271,33 @@ namespace CUSTIS.I18N.SampleDomainModel.DAL.Tests
         }
 
         [Test]
-        [Ignore("Run manually")]
-        public void TestManyProducts()
+        [SetUICulture("ru-RU")]
+        [Explicit("Long-running test")]
+        public void TestFilterByOneWithManyProducts()
         {
-           // TODO
+            using (var session = SessionFactory.Create())
+            {
+                foreach (var num in Enumerable.Range(1, 3000))
+                {
+
+                    var product = new Product
+                    {
+                        Code = num.ToString(),
+                        Name = new MultiCulturalString(ru, "RU_" + num)
+                            .SetLocalizedString(en, "EN_" + num)
+                    };
+                    session.Add(product);
+                }
+            }
+
+            
+            using (var session = SessionFactory.Create())
+            {
+                Func<Product> actualProduct = () => session.AsQueryable<Product>()
+                    .SingleOrDefault(p => p.Name.ToString() == "RU_2017");
+
+                Assert.That(actualProduct, Is.Not.Null.After(100));
+            }
         }
 
         public const string ProductNameRu = "Шоколад Алина";

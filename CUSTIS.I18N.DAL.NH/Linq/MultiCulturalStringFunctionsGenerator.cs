@@ -123,17 +123,6 @@ namespace CUSTIS.I18N.DAL.NH.Linq
                 };
             HqlTreeNode result = treeBuilder.MethodCall("mcs_get_string", parameters);
 
-            //if (method.Name == "ToString")
-            //{
-            //    return treeBuilder.Coalesce(result.AsExpression(), treeBuilder.Constant(string.Empty));
-            //}
-            //else if (method.Name == "GetString")
-            //{
-            //    return result;
-            //}
-            //else
-            //    throw new NotSupportedException();
-
             return result;
         }
 

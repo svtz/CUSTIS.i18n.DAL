@@ -1,13 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data;
-using System.Data.SqlTypes;
 using System.IO;
 using System.Linq;
 using System.Runtime.Serialization;
 using NHibernate;
 using NHibernate.SqlTypes;
-using NHibernate.Type;
 using NHibernate.UserTypes;
 
 namespace CUSTIS.I18N.DAL.NH.UserTypes

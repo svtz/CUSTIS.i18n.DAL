@@ -19,7 +19,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CUSTIS.I18N.SampleDomainMod
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{7B1C5109-8DD5-4406-9340-12D3F092E7B1}"
 	ProjectSection(SolutionItems) = preProject
-		CodeMap.dgml = CodeMap.dgml
 		ProductInfo.cs = ProductInfo.cs
 		README.md = README.md
 	EndProjectSection

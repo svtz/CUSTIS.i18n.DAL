@@ -1,5 +1,4 @@
-﻿using System;
-using System.Linq;
+﻿using System.Linq;
 using System.Transactions;
 using CUSTIS.I18N.DAL.NH.Linq;
 using CUSTIS.I18N.DAL.NH.SqlFunctions;
@@ -7,9 +6,7 @@ using CUSTIS.I18N.SampleDomainModel.DAL.NH;
 using CUSTIS.I18N.SampleDomainModel.DAL.Tests;
 using FluentNHibernate.Cfg;
 using FluentNHibernate.Cfg.Db;
-using NHibernate;
 using NHibernate.Cfg;
-using NHibernate.Dialect.Function;
 using NHibernate.Linq;
 using NHibernate.Tool.hbm2ddl;
 using NUnit.Framework;
@@ -32,7 +29,9 @@ namespace CUSTIS.I18N.SampleDomainModel.Tests.NH
             {
                 var dbConfig = OracleManagedDataClientConfiguration.Oracle10
                     .ConnectionString(csb => csb.FromConnectionStringWithKey("TestNhMcs"))
+#if DEBUG
                     .ShowSql()
+#endif
                     .FormatSql();
 
                 _sessionFactory = Fluently.Configure()
@@ -46,6 +45,7 @@ namespace CUSTIS.I18N.SampleDomainModel.Tests.NH
                         cfg.SqlFunctions.Add(MultiCulturalStringGet.FunctionName, new MultiCulturalStringGet());
                         cfg.LinqToHqlGeneratorsRegistry<McsLinqToHqlGeneratorsRegistry>();
                         cfg.SetProperty("hbm2ddl.keywords", "auto-quote");
+                        cfg.SetProperty("adonet.batch_size", "50");
                         new SchemaUpdate(cfg).Execute(true, true);
                     })
                     .BuildSessionFactory();
