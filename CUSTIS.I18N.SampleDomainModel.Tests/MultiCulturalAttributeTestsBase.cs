@@ -38,7 +38,6 @@ namespace CUSTIS.I18N.SampleDomainModel.DAL.Tests
         [OneTimeTearDown]
         public void OneTimeTearDown()
         {
-            
         }
 
         [SetUp]
@@ -229,7 +228,7 @@ namespace CUSTIS.I18N.SampleDomainModel.DAL.Tests
             using (var session = SessionFactory.Create())
             {
                 var product = session.AsQueryable<Product>()
-                    .SingleOrDefault(p => p.Name.ToString((IResourceFallbackProcess)null) == ProductNameEn);
+                    .SingleOrDefault(p => p.Name.ToString((IResourceFallbackProcess) null) == ProductNameEn);
 
                 Assert.IsNotNull(product);
                 Assert.AreEqual(ProductCode, product.Code);
@@ -245,7 +244,7 @@ namespace CUSTIS.I18N.SampleDomainModel.DAL.Tests
             using (var session = SessionFactory.Create())
             {
                 var product = session.AsQueryable<Product>()
-                    .SingleOrDefault(p => p.Name.ToString((IResourceFallbackProcess)null, ru) == ProductNameRu);
+                    .SingleOrDefault(p => p.Name.ToString((IResourceFallbackProcess) null, ru) == ProductNameRu);
 
                 Assert.IsNotNull(product);
                 Assert.AreEqual(ProductCode, product.Code);
@@ -261,7 +260,7 @@ namespace CUSTIS.I18N.SampleDomainModel.DAL.Tests
             using (var session = SessionFactory.Create())
             {
                 var specificFallbackProcess =
-                    new ChainsResourceFallbackProcess(new[] { new[] { "kz-KZ", "kz", "ru" }, new[] { "*", "en" } });
+                    new ChainsResourceFallbackProcess(new[] {new[] {"kz-KZ", "kz", "ru"}, new[] {"*", "en"}});
                 var product = session.AsQueryable<Product>()
                     .SingleOrDefault(p => p.Name.ToString(specificFallbackProcess, ru) == ProductNameRu);
 
@@ -279,7 +278,6 @@ namespace CUSTIS.I18N.SampleDomainModel.DAL.Tests
             {
                 foreach (var num in Enumerable.Range(1, 3000))
                 {
-
                     var product = new Product
                     {
                         Code = num.ToString(),
@@ -290,7 +288,7 @@ namespace CUSTIS.I18N.SampleDomainModel.DAL.Tests
                 }
             }
 
-            
+
             using (var session = SessionFactory.Create())
             {
                 Func<Product> actualProduct = () => session.AsQueryable<Product>()

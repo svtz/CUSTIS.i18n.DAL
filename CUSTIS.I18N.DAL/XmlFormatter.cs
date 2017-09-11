@@ -7,7 +7,7 @@ using System.Runtime.Serialization;
 using System.Text;
 using System.Xml;
 
-namespace CUSTIS.I18N.DAL.NH
+namespace CUSTIS.I18N.DAL
 {
     /// <summary>
     /// The <see cref="XmlFormatter"/> class implements a custom XmlFormatter
