@@ -59,7 +59,28 @@ namespace CUSTIS.I18N.SampleDomainModel.DAL.Tests
         }
 
         [Test]
-        public void TestStoreEmptyLangs()
+        public void TestStoreNullName()
+        {
+            using (var session = SessionFactory.Create())
+            {
+                var product = new TProduct
+                {
+                    Code = ProductCode,
+                    Name = null
+                };
+
+                session.Add(product);
+            }
+            using (var session = SessionFactory.Create())
+            {
+                var product = session.AsQueryable<TProduct>().SingleOrDefault(p => p.Code == ProductCode);
+
+                Assert.IsNotNull(product);
+            }
+        }
+
+        [Test]
+        public void TestStoreEmptyName()
         {
             using (var session = SessionFactory.Create())
             {

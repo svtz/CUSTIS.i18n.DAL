@@ -33,6 +33,9 @@ namespace CUSTIS.I18N.SampleDomainModel.DAL.EF
 
         private MultiCulturalString ParseStoredValue(string storedValue)
         {
+            if (storedValue == null)
+                return null;
+
             using (Stream stream = new MemoryStream())
             using (TextWriter writer = new StreamWriter(stream))
             {
@@ -47,6 +50,9 @@ namespace CUSTIS.I18N.SampleDomainModel.DAL.EF
 
         private string ConvertToStoredValue(MultiCulturalString typedValue)
         {
+            if (typedValue == null)
+                return null;
+
             using (Stream stream = new MemoryStream())
             {
                 IFormatter formatter = new XmlFormatter(typeof(MultiCulturalString), "http://custis.ru/i18n", Encoding.Unicode);

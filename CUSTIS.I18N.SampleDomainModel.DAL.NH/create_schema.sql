@@ -59,7 +59,7 @@ AS
   l_separator_position INTEGER;
 BEGIN
   IF (a_mcs IS NULL) THEN
-    raise_application_error(-20000, 'NULL a_mcs parameter');
+    RETURN NULL;
   END IF;
   IF (a_locale IS NULL) THEN
     raise_application_error(-20000, 'NULL a_locale parameter');
