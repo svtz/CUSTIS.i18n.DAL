@@ -1,4 +1,6 @@
-﻿create user TEST_NH_USER
+﻿-- Run under priviliged user (sys/system)
+
+create user TEST_NH_USER
   profile DEFAULT
   identified by test;
 grant connect to TEST_NH_USER;

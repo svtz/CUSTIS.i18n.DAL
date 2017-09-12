@@ -8,5 +8,5 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyConfiguration("")]
 [assembly: ComVisible(false)]
 [assembly: Guid("08d0b01a-bcb6-4d55-914c-d019b3b6010c")]
-[assembly: CLSCompliant(true)]
+[assembly: CLSCompliant(false)]
 [assembly: NeutralResourcesLanguage("ru")]

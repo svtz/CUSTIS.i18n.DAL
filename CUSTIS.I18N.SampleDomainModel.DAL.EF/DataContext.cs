@@ -1,47 +1,50 @@
-﻿//using System.ComponentModel.DataAnnotations.Schema;
-//using System.Data.Entity;
+﻿using Microsoft.EntityFrameworkCore;
 
-//namespace CUSTIS.I18N.SampleDomainModel.DAL.EF
-//{
-//    public class DataContext : DbContext
-//    {
-//        //public DbSet<ProductEx> Products {
-//        //    get { return Set<ProductEx>()/*.Covariant<Product>()*/; }
-//        //}
+namespace CUSTIS.I18N.SampleDomainModel.DAL.EF
+{
+    /// <inheritdoc />
+    public class DataContext : DbContext
+    {
+        /// <inheritdoc />
+        public DataContext(DbContextOptions<DataContext> options)
+            : base(options)
+        {
+        }
 
-//        protected override void OnModelCreating(DbModelBuilder modelBuilder)
-//        {
-//            //http://www.ladislavmrnka.com/2012/03/do-you-want-simple-type-mapping-or-conversions-in-ef/
+        /// <summary> Products </summary>
+        public DbSet<ProductProxy> Products => Set<ProductProxy>();
 
-//            // Соглашения по макс. длине строковых атрибутов
-//            // С EF6 все непросто, жа устарел, переходим на EF Core 2.0
-//            // upgrade NuGet to 3.6.0 https://www.nuget.org/downloads
-//            //modelBuilder.Conventions.Add(new StringMaxLengthConvention());
-//            //modelBuilder.Conventions.Add(new PropOraKeywordsConvention());
+        /// <inheritdoc />
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            //http://www.ladislavmrnka.com/2012/03/do-you-want-simple-type-mapping-or-conversions-in-ef/
+            //https://github.com/aspnet/EntityFrameworkCore/issues/242
 
-//            //Configuration.ProxyCreationEnabled = true;
+            var productEntityTypeConfiguration = modelBuilder.Entity<ProductProxy>()
+                .ToTable("t_product");
 
-//            //modelBuilder.ComplexType<MultiCulturalString>()
-//            //    .Property();
+            productEntityTypeConfiguration
+                .HasKey(pr => pr.Id);
 
-//            //modelBuilder.Types<MultiCulturalString>()
-//            //    .Configure(ctc => ctc.);
+            productEntityTypeConfiguration
+                .Property(pr => pr.Id)
+                .HasColumnName("id_product")
+                .UseSqlServerIdentityColumn();
 
-//            var productEntityTypeConfiguration = modelBuilder.Entity<ProductEx>()
-//                .ToTable("t_product")
-//                .HasKey(pr => pr.Id);
+            productEntityTypeConfiguration
+                .Property(pr => pr.Code)
+                .HasColumnName("code")
+                .IsRequired();
 
-//            productEntityTypeConfiguration
-//                .Property(pr => pr.Id)
-//                .HasColumnName("id_product")
-//                .HasDatabaseGeneratedOption(DatabaseGeneratedOption.Identity);
-//            productEntityTypeConfiguration
-//                .Property(pr => pr.Code)
-//                .HasColumnName("code")
-//                .IsRequired();
-//            // product.Name
+            productEntityTypeConfiguration
+                .Ignore(pr => pr.Name);
 
-//            base.OnModelCreating(modelBuilder);
-//        }
-//    }
-//}
+            productEntityTypeConfiguration
+                .Property(pr => pr.SerializedName)
+                .HasColumnName("name")
+                .UsePropertyAccessMode(PropertyAccessMode.Property);
+            
+            base.OnModelCreating(modelBuilder);
+        }
+    }
+}

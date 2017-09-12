@@ -45,7 +45,11 @@ namespace CUSTIS.I18N.DAL
         /// </summary>
         private Type _type = null;
 
+        /// <summary> Namespace </summary>
         private readonly string _ns;
+
+        /// <summary> Xml encoding </summary>
+        private readonly Encoding _encoding;
 
         /// <summary>
         /// Contains a list with objects that implement the IDeserializationCallback interface.
@@ -125,10 +129,18 @@ namespace CUSTIS.I18N.DAL
 
         #region [-- Constructors --]
 
+        /// <summary> Ctor </summary>
         public XmlFormatter(Type objectType, string ns)
+            : this(objectType, ns, Encoding.UTF8)
+        {
+        }
+
+        /// <summary> Ctor </summary>
+        public XmlFormatter(Type objectType, string ns, Encoding encoding)
         {
             _type = objectType;
             _ns = ns;
+            _encoding = encoding;
         }
 
         #endregion
@@ -152,7 +164,7 @@ namespace CUSTIS.I18N.DAL
 
             using (
                 XmlWriter writer = XmlWriter.Create(serializationStream,
-                    new XmlWriterSettings {Encoding = Encoding.UTF8}))
+                    new XmlWriterSettings {Encoding = _encoding}))
             {
                 Serialize(writer, new FormatterConverter(), objectToSerialize.GetType().Name, objectToSerialize,
                     objectToSerialize.GetType());
@@ -927,7 +939,7 @@ namespace CUSTIS.I18N.DAL
             /// Because the list uses the simple name of the type, it should be unique within the 
             /// assembly. Otherwise, a <see cref="System.ArgumentException"/> is thrown.
             /// </remarks>
-            /// <returns>A Dictionary<string, Type> object.</returns>
+            /// <returns>A <see cref="Dictionary{String,Type}"/> object.</returns>
             private static Dictionary<string, Type> LoadTypes(System.Reflection.Assembly assembly)
             {
                 Dictionary<string, Type> typeList = new Dictionary<string, Type>();

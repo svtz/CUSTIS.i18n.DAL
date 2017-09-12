@@ -14,7 +14,7 @@ using NUnit.Framework;
 namespace CUSTIS.I18N.SampleDomainModel.Tests.NH
 {
     [TestFixture]
-    public class MultiCulturalAttributeTests : MultiCulturalAttributeTestsBase
+    public class MultiCulturalAttributeTests : MultiCulturalAttributeTestsBase<Product>
     {
         public override ISessionFactory CreateSessionFactory()
         {
@@ -95,7 +95,8 @@ namespace CUSTIS.I18N.SampleDomainModel.Tests.NH
                 _nhSession.Save(entity);
             }
 
-            public IQueryable<T> AsQueryable<T>()
+            public IQueryable<T> AsQueryable<T>() 
+                where T : class
             {
                 return _nhSession.Query<T>();
             }

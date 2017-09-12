@@ -5,7 +5,8 @@ using NUnit.Framework;
 
 namespace CUSTIS.I18N.SampleDomainModel.DAL.Tests
 {
-    public abstract class MultiCulturalAttributeTestsBase
+    public abstract class MultiCulturalAttributeTestsBase<TProduct>
+        where TProduct : Product, new()
     {
         public interface ISessionFactory : IDisposable
         {
@@ -18,7 +19,8 @@ namespace CUSTIS.I18N.SampleDomainModel.DAL.Tests
         {
             void Add(object entity);
 
-            IQueryable<T> AsQueryable<T>();
+            IQueryable<T> AsQueryable<T>() 
+                where T : class;
         }
 
         public readonly CultureInfo ru = CultureInfo.GetCultureInfo("ru");
@@ -57,11 +59,32 @@ namespace CUSTIS.I18N.SampleDomainModel.DAL.Tests
         }
 
         [Test]
+        public void TestStoreEmptyLangs()
+        {
+            using (var session = SessionFactory.Create())
+            {
+                var product = new TProduct
+                {
+                    Code = ProductCode,
+                    Name = MultiCulturalString.Empty
+                };
+
+                session.Add(product);
+            }
+            using (var session = SessionFactory.Create())
+            {
+                var product = session.AsQueryable<TProduct>().SingleOrDefault(p => p.Code == ProductCode);
+
+                Assert.IsNotNull(product);
+            }
+        }
+
+        [Test]
         public void TestStoreSingleLang()
         {
             using (var session = SessionFactory.Create())
             {
-                var product = new Product
+                var product = new TProduct
                 {
                     Code = ProductCode,
                     Name = new MultiCulturalString(ru, ProductNameRu)
@@ -71,7 +94,7 @@ namespace CUSTIS.I18N.SampleDomainModel.DAL.Tests
             }
             using (var session = SessionFactory.Create())
             {
-                var product = session.AsQueryable<Product>().SingleOrDefault(p => p.Code == ProductCode);
+                var product = session.AsQueryable<TProduct>().SingleOrDefault(p => p.Code == ProductCode);
 
                 Assert.IsNotNull(product);
                 Assert.AreEqual(new MultiCulturalString(ru, ProductNameRu), product.Name);
@@ -84,7 +107,7 @@ namespace CUSTIS.I18N.SampleDomainModel.DAL.Tests
             CreateTwoLangProduct();
             using (var session = SessionFactory.Create())
             {
-                var product = session.AsQueryable<Product>().SingleOrDefault(p => p.Code == ProductCode);
+                var product = session.AsQueryable<TProduct>().SingleOrDefault(p => p.Code == ProductCode);
 
                 var multLangName = new MultiCulturalString(ru, ProductNameRu)
                     .SetLocalizedString(en, ProductNameEn);
@@ -119,7 +142,7 @@ namespace CUSTIS.I18N.SampleDomainModel.DAL.Tests
             CreateTwoLangProduct();
             using (var session = SessionFactory.Create())
             {
-                var product = session.AsQueryable<Product>()
+                var product = session.AsQueryable<TProduct>()
                     .SingleOrDefault(p => p.Name.ToString(ru, false) == ProductNameRu);
 
                 Assert.IsNotNull(product);
@@ -134,7 +157,7 @@ namespace CUSTIS.I18N.SampleDomainModel.DAL.Tests
             CreateTwoLangProduct();
             using (var session = SessionFactory.Create())
             {
-                var product = session.AsQueryable<Product>()
+                var product = session.AsQueryable<TProduct>()
                     .SingleOrDefault(p => p.Name.ToString(ru, false) == ProductNameRu);
 
                 Assert.IsNotNull(product);
@@ -149,7 +172,7 @@ namespace CUSTIS.I18N.SampleDomainModel.DAL.Tests
             CreateTwoLangProduct();
             using (var session = SessionFactory.Create())
             {
-                var product = session.AsQueryable<Product>()
+                var product = session.AsQueryable<TProduct>()
                     .SingleOrDefault(p => p.Name.ToString(ru) == ProductNameRu);
 
                 Assert.IsNotNull(product);
@@ -177,7 +200,7 @@ namespace CUSTIS.I18N.SampleDomainModel.DAL.Tests
 
             using (var session = SessionFactory.Create())
             {
-                var product = session.AsQueryable<Product>()
+                var product = session.AsQueryable<TProduct>()
                     .SingleOrDefault(p => p.Name.ToString() == ProductNameRu);
 
                 Assert.IsNotNull(product);
@@ -193,7 +216,7 @@ namespace CUSTIS.I18N.SampleDomainModel.DAL.Tests
 
             using (var session = SessionFactory.Create())
             {
-                var product = session.AsQueryable<Product>()
+                var product = session.AsQueryable<TProduct>()
                     .SingleOrDefault(p => p.Name.ToString() == ProductNameEn);
 
                 Assert.IsNotNull(product);
@@ -211,7 +234,7 @@ namespace CUSTIS.I18N.SampleDomainModel.DAL.Tests
             {
                 var specificFallbackProcess =
                     new ChainsResourceFallbackProcess(new[] {new[] {"kz-KZ", "kz", "ru"}, new[] {"*", "en"}});
-                var product = session.AsQueryable<Product>()
+                var product = session.AsQueryable<TProduct>()
                     .SingleOrDefault(p => p.Name.ToString(specificFallbackProcess) == ProductNameRu);
 
                 Assert.IsNotNull(product);
@@ -227,7 +250,7 @@ namespace CUSTIS.I18N.SampleDomainModel.DAL.Tests
 
             using (var session = SessionFactory.Create())
             {
-                var product = session.AsQueryable<Product>()
+                var product = session.AsQueryable<TProduct>()
                     .SingleOrDefault(p => p.Name.ToString((IResourceFallbackProcess) null) == ProductNameEn);
 
                 Assert.IsNotNull(product);
@@ -243,7 +266,7 @@ namespace CUSTIS.I18N.SampleDomainModel.DAL.Tests
 
             using (var session = SessionFactory.Create())
             {
-                var product = session.AsQueryable<Product>()
+                var product = session.AsQueryable<TProduct>()
                     .SingleOrDefault(p => p.Name.ToString((IResourceFallbackProcess) null, ru) == ProductNameRu);
 
                 Assert.IsNotNull(product);
@@ -261,7 +284,7 @@ namespace CUSTIS.I18N.SampleDomainModel.DAL.Tests
             {
                 var specificFallbackProcess =
                     new ChainsResourceFallbackProcess(new[] {new[] {"kz-KZ", "kz", "ru"}, new[] {"*", "en"}});
-                var product = session.AsQueryable<Product>()
+                var product = session.AsQueryable<TProduct>()
                     .SingleOrDefault(p => p.Name.ToString(specificFallbackProcess, ru) == ProductNameRu);
 
                 Assert.IsNotNull(product);
@@ -278,7 +301,7 @@ namespace CUSTIS.I18N.SampleDomainModel.DAL.Tests
             {
                 foreach (var num in Enumerable.Range(1, 3000))
                 {
-                    var product = new Product
+                    var product = new TProduct
                     {
                         Code = num.ToString(),
                         Name = new MultiCulturalString(ru, "RU_" + num)
@@ -291,7 +314,7 @@ namespace CUSTIS.I18N.SampleDomainModel.DAL.Tests
 
             using (var session = SessionFactory.Create())
             {
-                Func<Product> actualProduct = () => session.AsQueryable<Product>()
+                Func<TProduct> actualProduct = () => session.AsQueryable<TProduct>()
                     .SingleOrDefault(p => p.Name.ToString() == "RU_2017");
 
                 Assert.That(actualProduct, Is.Not.Null.After(100));
@@ -306,7 +329,7 @@ namespace CUSTIS.I18N.SampleDomainModel.DAL.Tests
         {
             using (var session = SessionFactory.Create())
             {
-                var product = new Product
+                var product = new TProduct
                 {
                     Code = ProductCode,
                     Name = new MultiCulturalString(ru, ProductNameRu)

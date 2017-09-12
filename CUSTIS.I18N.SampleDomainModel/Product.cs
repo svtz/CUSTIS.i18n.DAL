@@ -1,6 +1,6 @@
 ﻿namespace CUSTIS.I18N.SampleDomainModel
 {
-    /// <summary> Товар </summary>
+    /// <summary> Product </summary>
     public class Product
     {
         /// <summary> Id </summary>
