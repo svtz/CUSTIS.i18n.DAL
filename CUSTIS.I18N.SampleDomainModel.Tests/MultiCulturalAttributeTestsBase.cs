@@ -8,6 +8,8 @@ namespace CUSTIS.I18N.SampleDomainModel.DAL.Tests
     public abstract class MultiCulturalAttributeTestsBase<TProduct>
         where TProduct : Product, new()
     {
+        #region Session-related
+
         public interface ISessionFactory : IDisposable
         {
             void CleanAllEntities();
@@ -19,16 +21,24 @@ namespace CUSTIS.I18N.SampleDomainModel.DAL.Tests
         {
             void Add(object entity);
 
-            IQueryable<T> AsQueryable<T>() 
+            IQueryable<T> AsQueryable<T>()
                 where T : class;
         }
+
+        public abstract ISessionFactory CreateSessionFactory();
+
+        public ISessionFactory SessionFactory { get; private set; } 
+
+        #endregion
 
         public readonly CultureInfo ru = CultureInfo.GetCultureInfo("ru");
         public readonly CultureInfo en = CultureInfo.GetCultureInfo("en");
 
-        public abstract ISessionFactory CreateSessionFactory();
+        public const string ProductNameRu = "Шоколад Алина";
+        public const string ProductNameEn = "Chocolate Alina";
+        public const string ProductCode = "V0016887";
 
-        public ISessionFactory SessionFactory { get; private set; }
+        #region Setup/Teardown
 
         [OneTimeSetUp]
         public void OneTimeSetUp()
@@ -46,7 +56,7 @@ namespace CUSTIS.I18N.SampleDomainModel.DAL.Tests
         public void SetUp()
         {
             // WARN: Creation/disposing of a session factory SHOULD be placed into OneTimeSetUp/OneTimeTearDown
-            // but we need destroy query plan cache because of the defect NH-2500
+            // but we need destroy query plan cache because of the defect NH-2500 https://nhibernate.jira.com/browse/NH-2500
             SessionFactory = CreateSessionFactory();
 
             SessionFactory.CleanAllEntities();
@@ -57,6 +67,10 @@ namespace CUSTIS.I18N.SampleDomainModel.DAL.Tests
         {
             SessionFactory?.Dispose();
         }
+
+        #endregion
+
+        #region Test Methods
 
         [Test]
         public void TestStoreNullName()
@@ -158,47 +172,18 @@ namespace CUSTIS.I18N.SampleDomainModel.DAL.Tests
             TestFilterByMultiCulturalAttr_ToString_RuFalse_WhenAnyCulture_Impl();
         }
 
-        private void TestFilterByMultiCulturalAttr_ToString_RuFalse_WhenAnyCulture_Impl()
-        {
-            CreateTwoLangProduct();
-            using (var session = SessionFactory.Create())
-            {
-                var product = session.AsQueryable<TProduct>()
-                    .SingleOrDefault(p => p.Name.ToString(ru, false) == ProductNameRu);
-
-                Assert.IsNotNull(product);
-                Assert.AreEqual(ProductCode, product.Code);
-            }
-        }
-
         [Test]
         [SetUICulture("en-US")]
-        public void TestFilterByMultiCulturalAttr_ToString_RuFalse_WhenEnUse_Impl()
+        public void TestFilterByMultiCulturalAttr_ToString_RuFalse_WhenEnUse()
         {
-            CreateTwoLangProduct();
-            using (var session = SessionFactory.Create())
-            {
-                var product = session.AsQueryable<TProduct>()
-                    .SingleOrDefault(p => p.Name.ToString(ru, false) == ProductNameRu);
-
-                Assert.IsNotNull(product);
-                Assert.AreEqual(ProductCode, product.Code);
-            }
+            TestFilterByMultiCulturalAttr_ToString_RuFalse_WhenEnUse_Impl();
         }
 
         [Test]
         [SetUICulture("en-US")]
         public void TestFilterByMultiCulturalAttr_ToString_Ru_WhenEnUs()
         {
-            CreateTwoLangProduct();
-            using (var session = SessionFactory.Create())
-            {
-                var product = session.AsQueryable<TProduct>()
-                    .SingleOrDefault(p => p.Name.ToString(ru) == ProductNameRu);
-
-                Assert.IsNotNull(product);
-                Assert.AreEqual(ProductCode, product.Code);
-            }
+            TestFilterByMultiCulturalAttr_ToString_Ru_WhenEnUs_Impl();
         }
 
         [Test]
@@ -215,102 +200,46 @@ namespace CUSTIS.I18N.SampleDomainModel.DAL.Tests
             TestFilterByMultiCulturalAttr_ToString_WhenRu_Impl();
         }
 
-        private void TestFilterByMultiCulturalAttr_ToString_WhenRu_Impl()
-        {
-            CreateTwoLangProduct();
-
-            using (var session = SessionFactory.Create())
-            {
-                var product = session.AsQueryable<TProduct>()
-                    .SingleOrDefault(p => p.Name.ToString() == ProductNameRu);
-
-                Assert.IsNotNull(product);
-                Assert.AreEqual(ProductCode, product.Code);
-            }
-        }
-
         [Test]
         [SetUICulture("en")]
         public void TestFilterByMultiCulturalAttr_ToString_WhenEn()
         {
-            CreateTwoLangProduct();
-
-            using (var session = SessionFactory.Create())
-            {
-                var product = session.AsQueryable<TProduct>()
-                    .SingleOrDefault(p => p.Name.ToString() == ProductNameEn);
-
-                Assert.IsNotNull(product);
-                Assert.AreEqual(ProductCode, product.Code);
-            }
+            TestFilterByMultiCulturalAttr_ToString_WhenEn_Impl();
         }
 
         [Test]
         [SetUICulture("kz-KZ")]
         public void TestFilterByMultiCulturalAttr_ToString_Fallback_WhenKzKz()
         {
-            CreateTwoLangProduct();
-
-            using (var session = SessionFactory.Create())
-            {
-                var specificFallbackProcess =
-                    new ChainsResourceFallbackProcess(new[] {new[] {"kz-KZ", "kz", "ru"}, new[] {"*", "en"}});
-                var product = session.AsQueryable<TProduct>()
-                    .SingleOrDefault(p => p.Name.ToString(specificFallbackProcess) == ProductNameRu);
-
-                Assert.IsNotNull(product);
-                Assert.AreEqual(ProductCode, product.Code);
-            }
+            TestFilterByMultiCulturalAttr_ToString_Fallback_WhenKzKz_impl();
         }
 
         [Test]
         [SetUICulture("kz-KZ")]
         public void TestFilterByMultiCulturalAttr_ToString_NullFallback_WhenKzKz()
         {
-            CreateTwoLangProduct();
+            TestFilterByMultiCulturalAttr_ToString_NullFallback_WhenKzKz_Impl();
+        }
 
-            using (var session = SessionFactory.Create())
-            {
-                var product = session.AsQueryable<TProduct>()
-                    .SingleOrDefault(p => p.Name.ToString((IResourceFallbackProcess) null) == ProductNameEn);
-
-                Assert.IsNotNull(product);
-                Assert.AreEqual(ProductCode, product.Code);
-            }
+        [Test]
+        [SetUICulture("en")]
+        public void TestFilterByMultiCulturalAttr_ToString_False_WhenEn()
+        {
+            TestFilterByMultiCulturalAttr_ToString_False_WhenEn_Impl();
         }
 
         [Test]
         [SetUICulture("kz-KZ")]
         public void TestFilterByMultiCulturalAttr_ToString_NullFallbackRu_WhenKzKz()
         {
-            CreateTwoLangProduct();
-
-            using (var session = SessionFactory.Create())
-            {
-                var product = session.AsQueryable<TProduct>()
-                    .SingleOrDefault(p => p.Name.ToString((IResourceFallbackProcess) null, ru) == ProductNameRu);
-
-                Assert.IsNotNull(product);
-                Assert.AreEqual(ProductCode, product.Code);
-            }
+            TestFilterByMultiCulturalAttr_ToString_NullFallbackRu_WhenKzKz_Impl();
         }
 
         [Test]
         [SetUICulture("kz-KZ")]
         public void TestFilterByMultiCulturalAttr_ToString_FallbackRu_WhenKzKz()
         {
-            CreateTwoLangProduct();
-
-            using (var session = SessionFactory.Create())
-            {
-                var specificFallbackProcess =
-                    new ChainsResourceFallbackProcess(new[] {new[] {"kz-KZ", "kz", "ru"}, new[] {"*", "en"}});
-                var product = session.AsQueryable<TProduct>()
-                    .SingleOrDefault(p => p.Name.ToString(specificFallbackProcess, ru) == ProductNameRu);
-
-                Assert.IsNotNull(product);
-                Assert.AreEqual(ProductCode, product.Code);
-            }
+            TestFilterByMultiCulturalAttr_ToString_FallbackRu_WhenKzKz_Impl();
         }
 
         [Test]
@@ -318,35 +247,14 @@ namespace CUSTIS.I18N.SampleDomainModel.DAL.Tests
         [Explicit("Long-running test")]
         public void TestFilterByOneWithManyProducts()
         {
-            using (var session = SessionFactory.Create())
-            {
-                foreach (var num in Enumerable.Range(1, 3000))
-                {
-                    var product = new TProduct
-                    {
-                        Code = num.ToString(),
-                        Name = new MultiCulturalString(ru, "RU_" + num)
-                            .SetLocalizedString(en, "EN_" + num)
-                    };
-                    session.Add(product);
-                }
-            }
-
-
-            using (var session = SessionFactory.Create())
-            {
-                Func<TProduct> actualProduct = () => session.AsQueryable<TProduct>()
-                    .SingleOrDefault(p => p.Name.ToString() == "RU_2017");
-
-                Assert.That(actualProduct, Is.Not.Null.After(100));
-            }
+            TestFilterByOneWithManyProducts_Impl();
         }
 
-        public const string ProductNameRu = "Шоколад Алина";
-        public const string ProductNameEn = "Chocolate Alina";
-        public const string ProductCode = "V0016887";
+        #endregion
 
-        private void CreateTwoLangProduct()
+        #region Helper Methods
+
+        protected void CreateTwoLangProduct()
         {
             using (var session = SessionFactory.Create())
             {
@@ -360,5 +268,29 @@ namespace CUSTIS.I18N.SampleDomainModel.DAL.Tests
                 session.Add(product);
             }
         }
+
+        protected abstract void TestFilterByMultiCulturalAttr_ToString_WhenEn_Impl();
+
+        protected abstract void TestFilterByMultiCulturalAttr_ToString_RuFalse_WhenAnyCulture_Impl();
+
+        protected abstract void TestFilterByMultiCulturalAttr_ToString_RuFalse_WhenEnUse_Impl();
+
+        protected abstract void TestFilterByMultiCulturalAttr_ToString_Ru_WhenEnUs_Impl();
+
+        protected abstract void TestFilterByMultiCulturalAttr_ToString_WhenRu_Impl();
+
+        protected abstract void TestFilterByMultiCulturalAttr_ToString_Fallback_WhenKzKz_impl();
+
+        protected abstract void TestFilterByMultiCulturalAttr_ToString_NullFallback_WhenKzKz_Impl();
+
+        protected abstract void TestFilterByMultiCulturalAttr_ToString_False_WhenEn_Impl();
+
+        protected abstract void TestFilterByMultiCulturalAttr_ToString_NullFallbackRu_WhenKzKz_Impl();
+
+        protected abstract void TestFilterByMultiCulturalAttr_ToString_FallbackRu_WhenKzKz_Impl();
+
+        protected abstract void TestFilterByOneWithManyProducts_Impl();
+
+        #endregion
     }
 }

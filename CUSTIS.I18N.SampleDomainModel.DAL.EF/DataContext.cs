@@ -1,4 +1,7 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using System.Globalization;
+using CUSTIS.I18N.DAL.EF;
+using CUSTIS.I18N.DAL.EF.Linq;
+using Microsoft.EntityFrameworkCore;
 
 namespace CUSTIS.I18N.SampleDomainModel.DAL.EF
 {
@@ -15,10 +18,20 @@ namespace CUSTIS.I18N.SampleDomainModel.DAL.EF
         public DbSet<ProductProxy> Products => Set<ProductProxy>();
 
         /// <inheritdoc />
+        /// <remarks>
+        /// We could improve our code after fixing the next issues: 
+        /// https://github.com/aspnet/EntityFrameworkCore/issues/242 
+        /// https://github.com/aspnet/EntityFrameworkCore/issues/9213
+        /// </remarks>
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            //http://www.ladislavmrnka.com/2012/03/do-you-want-simple-type-mapping-or-conversions-in-ef/
-            //https://github.com/aspnet/EntityFrameworkCore/issues/242
+            modelBuilder.HasMcsGetStringDbFunction(() => DbUserDefinedMethods.McsGetString(default(string)));
+            modelBuilder.HasMcsGetStringDbFunction(() => DbUserDefinedMethods.McsGetString(default(string), default(bool)));
+            modelBuilder.HasMcsGetStringDbFunction(() => DbUserDefinedMethods.McsGetString(default(string), default(CultureInfo)));
+            modelBuilder.HasMcsGetStringDbFunction(() => DbUserDefinedMethods.McsGetString(default(string), default(IResourceFallbackProcess)));
+            modelBuilder.HasMcsGetStringDbFunction(() => DbUserDefinedMethods.McsGetString(default(string), default(CultureInfo), default(bool)));
+            modelBuilder.HasMcsGetStringDbFunction(() => DbUserDefinedMethods.McsGetString(default(string), default(IResourceFallbackProcess), default(CultureInfo)));
+            modelBuilder.HasMcsGetStringDbFunction(() => DbUserDefinedMethods.McsGetString(default(string), default(IResourceFallbackProcess), default(CultureInfo), default(bool)));
 
             var productEntityTypeConfiguration = modelBuilder.Entity<ProductProxy>()
                 .ToTable("t_product");
@@ -40,11 +53,12 @@ namespace CUSTIS.I18N.SampleDomainModel.DAL.EF
                 .Ignore(pr => pr.Name);
 
             productEntityTypeConfiguration
-                .Property(pr => pr.SerializedName)
+                .Property(pr => pr.RawName)
                 .HasColumnName("name")
                 .UsePropertyAccessMode(PropertyAccessMode.Property);
             
             base.OnModelCreating(modelBuilder);
         }
+
     }
 }

@@ -7,5 +7,5 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyDescription("DAL на EntityFramework")]
 [assembly: AssemblyConfiguration("")]
 [assembly: ComVisible(false)]
-[assembly: CLSCompliant(true)]
+[assembly: CLSCompliant(false)]
 [assembly: NeutralResourcesLanguage("ru")]

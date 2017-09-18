@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using System.Transactions;
 using CUSTIS.I18N.DAL.NH.Linq;
 using CUSTIS.I18N.DAL.NH.SqlFunctions;
@@ -16,6 +17,8 @@ namespace CUSTIS.I18N.SampleDomainModel.Tests.NH
     [TestFixture]
     public class MultiCulturalAttributeTests : MultiCulturalAttributeTestsBase<Product>
     {
+        #region Session-related
+
         public override ISessionFactory CreateSessionFactory()
         {
             return new SessionFactoryImpl();
@@ -95,12 +98,186 @@ namespace CUSTIS.I18N.SampleDomainModel.Tests.NH
                 _nhSession.Save(entity);
             }
 
-            public IQueryable<T> AsQueryable<T>() 
+            public IQueryable<T> AsQueryable<T>()
                 where T : class
             {
                 return _nhSession.Query<T>();
             }
         }
+
+        #endregion
+
+        #region Test Implementations
+
+        protected override void TestFilterByMultiCulturalAttr_ToString_WhenEn_Impl()
+        {
+            CreateTwoLangProduct();
+
+            using (var session = SessionFactory.Create())
+            {
+                var product = session.AsQueryable<Product>()
+                    .SingleOrDefault(p => p.Name.ToString() == ProductNameEn);
+
+                Assert.IsNotNull(product);
+                Assert.AreEqual(ProductCode, product.Code);
+            }
+        }
+
+        protected override void TestFilterByMultiCulturalAttr_ToString_RuFalse_WhenAnyCulture_Impl()
+        {
+            CreateTwoLangProduct();
+            using (var session = SessionFactory.Create())
+            {
+                var name = ProductNameRu;
+                var product = session.AsQueryable<Product>()
+                    .SingleOrDefault(p => p.Name.ToString(ru, false) == name);
+
+                Assert.IsNotNull(product);
+                Assert.AreEqual(ProductCode, product.Code);
+            }
+        }
+
+        protected override void TestFilterByMultiCulturalAttr_ToString_FallbackRu_WhenKzKz_Impl()
+        {
+            CreateTwoLangProduct();
+
+            using (var session = SessionFactory.Create())
+            {
+                var specificFallbackProcess =
+                    new ChainsResourceFallbackProcess(new[] { new[] { "kz-KZ", "kz", "ru" }, new[] { "*", "en" } });
+                var product = session.AsQueryable<Product>()
+                    .SingleOrDefault(p => p.Name.ToString(specificFallbackProcess, ru) == ProductNameRu);
+
+                Assert.IsNotNull(product);
+                Assert.AreEqual(ProductCode, product.Code);
+            }
+        }
+
+        protected override void TestFilterByMultiCulturalAttr_ToString_NullFallbackRu_WhenKzKz_Impl()
+        {
+            CreateTwoLangProduct();
+
+            using (var session = SessionFactory.Create())
+            {
+                var product = session.AsQueryable<Product>()
+                    .SingleOrDefault(p => p.Name.ToString((IResourceFallbackProcess)null, ru) == ProductNameRu);
+
+                Assert.IsNotNull(product);
+                Assert.AreEqual(ProductCode, product.Code);
+            }
+        }
+
+        protected override void TestFilterByMultiCulturalAttr_ToString_NullFallback_WhenKzKz_Impl()
+        {
+            CreateTwoLangProduct();
+
+            using (var session = SessionFactory.Create())
+            {
+                var product = session.AsQueryable<Product>()
+                    .SingleOrDefault(p => p.Name.ToString((IResourceFallbackProcess)null) == ProductNameEn);
+
+                Assert.IsNotNull(product);
+                Assert.AreEqual(ProductCode, product.Code);
+            }
+        }
+
+        protected override void TestFilterByMultiCulturalAttr_ToString_False_WhenEn_Impl()
+        {
+            CreateTwoLangProduct();
+
+            using (var session = SessionFactory.Create())
+            {
+                var product = session.AsQueryable<Product>()
+                    .SingleOrDefault(p => p.Name.ToString(false) == ProductNameEn);
+
+                Assert.IsNotNull(product);
+                Assert.AreEqual(ProductCode, product.Code);
+            }
+        }
+
+        protected override void TestFilterByMultiCulturalAttr_ToString_Fallback_WhenKzKz_impl()
+        {
+            CreateTwoLangProduct();
+
+            using (var session = SessionFactory.Create())
+            {
+                var specificFallbackProcess =
+                    new ChainsResourceFallbackProcess(new[] { new[] { "kz-KZ", "kz", "ru" }, new[] { "*", "en" } });
+                var product = session.AsQueryable<Product>()
+                    .SingleOrDefault(p => p.Name.ToString(specificFallbackProcess) == ProductNameRu);
+
+                Assert.IsNotNull(product);
+                Assert.AreEqual(ProductCode, product.Code);
+            }
+        }
+
+        protected override void TestFilterByOneWithManyProducts_Impl()
+        {
+            using (var session = SessionFactory.Create())
+            {
+                foreach (var num in Enumerable.Range(1, 3000))
+                {
+                    var product = new Product
+                    {
+                        Code = num.ToString(),
+                        Name = new MultiCulturalString(ru, "RU_" + num)
+                            .SetLocalizedString(en, "EN_" + num)
+                    };
+                    session.Add(product);
+                }
+            }
+
+
+            using (var session = SessionFactory.Create())
+            {
+                Func<Product> actualProduct = () => session.AsQueryable<Product>()
+                    .SingleOrDefault(p => p.Name.ToString() == "RU_2017");
+
+                Assert.That(actualProduct, Is.Not.Null.After(100));
+            }
+        }
+
+        protected override void TestFilterByMultiCulturalAttr_ToString_WhenRu_Impl()
+        {
+            CreateTwoLangProduct();
+
+            using (var session = SessionFactory.Create())
+            {
+                var product = session.AsQueryable<Product>()
+                    .SingleOrDefault(p => p.Name.ToString() == ProductNameRu);
+
+                Assert.IsNotNull(product);
+                Assert.AreEqual(ProductCode, product.Code);
+            }
+        }
+
+        protected override void TestFilterByMultiCulturalAttr_ToString_Ru_WhenEnUs_Impl()
+        {
+            CreateTwoLangProduct();
+            using (var session = SessionFactory.Create())
+            {
+                var product = session.AsQueryable<Product>()
+                    .SingleOrDefault(p => p.Name.ToString(ru) == ProductNameRu);
+
+                Assert.IsNotNull(product);
+                Assert.AreEqual(ProductCode, product.Code);
+            }
+        }
+
+        protected override void TestFilterByMultiCulturalAttr_ToString_RuFalse_WhenEnUse_Impl()
+        {
+            CreateTwoLangProduct();
+            using (var session = SessionFactory.Create())
+            {
+                var product = session.AsQueryable<Product>()
+                    .SingleOrDefault(p => p.Name.ToString(ru, false) == ProductNameRu);
+
+                Assert.IsNotNull(product);
+                Assert.AreEqual(ProductCode, product.Code);
+            }
+        } 
+
+        #endregion
 
     }
 }

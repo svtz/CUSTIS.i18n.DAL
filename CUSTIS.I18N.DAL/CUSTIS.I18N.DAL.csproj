@@ -11,6 +11,10 @@
     <ItemGroup>
     <Compile Include="..\ProductInfo.cs" Link="Properties\ProductInfo.cs" />
   </ItemGroup>
+  
+    <ItemGroup>
+      <ProjectReference Include="..\CUSTIS.I18N\CUSTIS.I18N\CUSTIS.I18N.netstandard.csproj" />
+    </ItemGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
     <DocumentationFile>bin\Release\netstandard2.0\CUSTIS.I18N.DAL.xml</DocumentationFile>

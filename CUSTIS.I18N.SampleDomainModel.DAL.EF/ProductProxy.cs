@@ -14,22 +14,22 @@ namespace CUSTIS.I18N.SampleDomainModel.DAL.EF
             get => base.Name;
             set
             {
-                _serializedName = ConvertToStoredValue(value);
+                _rawName = ConvertToStoredValue(value);
                 base.Name = value;
             }
         }
 
         /// <summary> Serialized <see cref="Name"/> </summary>
-        protected internal virtual string SerializedName
+        public virtual string RawName
         {
-            get => _serializedName;
+            get => _rawName;
             set
             {
                 base.Name = ParseStoredValue(value);
-                _serializedName = value;
+                _rawName = value;
             }
         }
-        private string _serializedName;
+        private string _rawName;
 
         private MultiCulturalString ParseStoredValue(string storedValue)
         {

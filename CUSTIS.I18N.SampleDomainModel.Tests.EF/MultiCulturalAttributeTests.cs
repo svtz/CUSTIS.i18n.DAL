@@ -1,6 +1,8 @@
-﻿using System.Configuration;
+﻿using System;
+using System.Configuration;
 using System.Linq;
-using System.Transactions;
+using CUSTIS.I18N.DAL.EF;
+using CUSTIS.I18N.DAL.EF.Linq;
 using CUSTIS.I18N.SampleDomainModel.DAL.EF;
 using CUSTIS.I18N.SampleDomainModel.DAL.Tests;
 using Microsoft.EntityFrameworkCore;
@@ -13,6 +15,8 @@ namespace CUSTIS.I18N.SampleDomainModel.Tests.EF
     [TestFixture]
     public class MultiCulturalAttributeTests : MultiCulturalAttributeTestsBase<ProductProxy>
     {
+        #region Session-related
+
         public override ISessionFactory CreateSessionFactory()
         {
             return new SessionFactoryImpl();
@@ -27,7 +31,7 @@ namespace CUSTIS.I18N.SampleDomainModel.Tests.EF
                 var connectionString = ConfigurationManager.ConnectionStrings["TestEfMcs"].ConnectionString;
                 _options = new DbContextOptionsBuilder<DataContext>()
                     .UseSqlServer(connectionString)
-                    // throw on client evaluation, e.g. IQueryable<Product>.SingleOrDefault(pr => pr.Name.ToString() == @p1)
+                    // throw on client evaluation, e.g. IQueryable<ProductProxy>.SingleOrDefault(pr => pr.Name.ToString() == @p1)
                     .ConfigureWarnings(wcb => wcb.Throw(RelationalEventId.QueryClientEvaluationWarning))
                     .Options;
             }
@@ -81,5 +85,180 @@ namespace CUSTIS.I18N.SampleDomainModel.Tests.EF
                 return _dbCtx.Set<T>();
             }
         }
+
+        #endregion
+
+        #region Test Implementations
+
+        protected override void TestFilterByMultiCulturalAttr_ToString_WhenEn_Impl()
+        {
+            CreateTwoLangProduct();
+
+            using (var session = SessionFactory.Create())
+            {
+                var product = session.AsQueryable<ProductProxy>()
+                    .SingleOrDefault(p => p.RawName.McsGetString() == ProductNameEn);
+
+                Assert.IsNotNull(product);
+                Assert.AreEqual(ProductCode, product.Code);
+            }
+        }
+
+        protected override void TestFilterByMultiCulturalAttr_ToString_RuFalse_WhenAnyCulture_Impl()
+        {
+            CreateTwoLangProduct();
+            using (var session = SessionFactory.Create())
+            {
+                var name = ProductNameRu;
+                var product = session.AsQueryable<ProductProxy>()
+                    .SingleOrDefault(p => p.RawName.McsGetString(ru, false) == name);
+
+                Assert.IsNotNull(product);
+                Assert.AreEqual(ProductCode, product.Code);
+            }
+        }
+
+        protected override void TestFilterByMultiCulturalAttr_ToString_FallbackRu_WhenKzKz_Impl()
+        {
+            CreateTwoLangProduct();
+
+            using (var session = SessionFactory.Create())
+            {
+                var specificFallbackProcess =
+                    new ChainsResourceFallbackProcess(new[] { new[] { "kz-KZ", "kz", "ru" }, new[] { "*", "en" } });
+                var product = session.AsQueryable<ProductProxy>()
+                    .SingleOrDefault(p => p.RawName.McsGetString(specificFallbackProcess, ru) == ProductNameRu);
+
+                Assert.IsNotNull(product);
+                Assert.AreEqual(ProductCode, product.Code);
+            }
+        }
+
+        protected override void TestFilterByMultiCulturalAttr_ToString_NullFallbackRu_WhenKzKz_Impl()
+        {
+            CreateTwoLangProduct();
+
+            using (var session = SessionFactory.Create())
+            {
+                var product = session.AsQueryable<ProductProxy>()
+                    .SingleOrDefault(p => p.RawName.McsGetString((IResourceFallbackProcess)null, ru) == ProductNameRu);
+
+                Assert.IsNotNull(product);
+                Assert.AreEqual(ProductCode, product.Code);
+            }
+        }
+
+        protected override void TestFilterByMultiCulturalAttr_ToString_NullFallback_WhenKzKz_Impl()
+        {
+            CreateTwoLangProduct();
+
+            using (var session = SessionFactory.Create())
+            {
+                var product = session.AsQueryable<ProductProxy>()
+                    .SingleOrDefault(p => p.RawName.McsGetString((IResourceFallbackProcess)null) == ProductNameEn);
+
+                Assert.IsNotNull(product);
+                Assert.AreEqual(ProductCode, product.Code);
+            }
+        }
+
+        protected override void TestFilterByMultiCulturalAttr_ToString_False_WhenEn_Impl()
+        {
+            CreateTwoLangProduct();
+
+            using (var session = SessionFactory.Create())
+            {
+                var product = session.AsQueryable<ProductProxy>()
+                    .SingleOrDefault(p => p.RawName.McsGetString(false) == ProductNameEn);
+
+                Assert.IsNotNull(product);
+                Assert.AreEqual(ProductCode, product.Code);
+            }
+        }
+
+        protected override void TestFilterByMultiCulturalAttr_ToString_Fallback_WhenKzKz_impl()
+        {
+            CreateTwoLangProduct();
+
+            using (var session = SessionFactory.Create())
+            {
+                var specificFallbackProcess =
+                    new ChainsResourceFallbackProcess(new[] { new[] { "kz-KZ", "kz", "ru" }, new[] { "*", "en" } });
+                var product = session.AsQueryable<ProductProxy>()
+                    .SingleOrDefault(p => p.RawName.McsGetString(specificFallbackProcess) == ProductNameRu);
+
+                Assert.IsNotNull(product);
+                Assert.AreEqual(ProductCode, product.Code);
+            }
+        }
+
+        protected override void TestFilterByOneWithManyProducts_Impl()
+        {
+            using (var session = SessionFactory.Create())
+            {
+                foreach (var num in Enumerable.Range(1, 3000))
+                {
+                    var product = new ProductProxy
+                    {
+                        Code = num.ToString(),
+                        Name = new MultiCulturalString(ru, "RU_" + num)
+                            .SetLocalizedString(en, "EN_" + num)
+                    };
+                    session.Add(product);
+                }
+            }
+
+
+            using (var session = SessionFactory.Create())
+            {
+                Func<ProductProxy> actualProduct = () => session.AsQueryable<ProductProxy>()
+                    .SingleOrDefault(p => p.RawName.McsGetString() == "RU_2017");
+
+                Assert.That(actualProduct, Is.Not.Null.After(100));
+            }
+        }
+
+        protected override void TestFilterByMultiCulturalAttr_ToString_WhenRu_Impl()
+        {
+            CreateTwoLangProduct();
+
+            using (var session = SessionFactory.Create())
+            {
+                var product = session.AsQueryable<ProductProxy>()
+                    .SingleOrDefault(p => p.RawName.McsGetString() == ProductNameRu);
+
+                Assert.IsNotNull(product);
+                Assert.AreEqual(ProductCode, product.Code);
+            }
+        }
+
+        protected override void TestFilterByMultiCulturalAttr_ToString_Ru_WhenEnUs_Impl()
+        {
+            CreateTwoLangProduct();
+            using (var session = SessionFactory.Create())
+            {
+                var product = session.AsQueryable<ProductProxy>()
+                    .SingleOrDefault(p => p.RawName.McsGetString(ru) == ProductNameRu);
+
+                Assert.IsNotNull(product);
+                Assert.AreEqual(ProductCode, product.Code);
+            }
+        }
+
+        protected override void TestFilterByMultiCulturalAttr_ToString_RuFalse_WhenEnUse_Impl()
+        {
+            CreateTwoLangProduct();
+            using (var session = SessionFactory.Create())
+            {
+                var product = session.AsQueryable<ProductProxy>()
+                    .SingleOrDefault(p => p.RawName.McsGetString(ru, false) == ProductNameRu);
+
+                Assert.IsNotNull(product);
+                Assert.AreEqual(ProductCode, product.Code);
+            }
+        }
+
+        #endregion
+
     }
 }

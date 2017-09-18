@@ -23,9 +23,11 @@
   
   <ItemGroup>
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="2.0.0" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="2.0.0" />
   </ItemGroup>
   
   <ItemGroup>
+    <ProjectReference Include="..\CUSTIS.I18N.DAL\CUSTIS.I18N.DAL.csproj" />
     <ProjectReference Include="..\CUSTIS.I18N\CUSTIS.I18N\CUSTIS.I18N.netstandard.csproj" />
   </ItemGroup>
 
