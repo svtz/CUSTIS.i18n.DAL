@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Globalization;
 using System.Linq;
+using System.Threading;
 using System.Transactions;
 using CUSTIS.I18N.DAL.NH.Linq;
 using CUSTIS.I18N.DAL.NH.SqlFunctions;
@@ -7,10 +9,11 @@ using CUSTIS.I18N.SampleDomainModel.DAL.NH;
 using CUSTIS.I18N.SampleDomainModel.DAL.Tests;
 using FluentNHibernate.Cfg;
 using FluentNHibernate.Cfg.Db;
-using NHibernate.Cfg;
-using NHibernate.Linq;
+using NHibernate;
 using NHibernate.Tool.hbm2ddl;
 using NUnit.Framework;
+using NHibernate.Cfg;
+using NHibernate.Linq;
 
 namespace CUSTIS.I18N.SampleDomainModel.Tests.NH
 {
@@ -275,9 +278,39 @@ namespace CUSTIS.I18N.SampleDomainModel.Tests.NH
                 Assert.IsNotNull(product);
                 Assert.AreEqual(ProductCode, product.Code);
             }
-        } 
+        }
 
         #endregion
 
+
+        #region NH-specific tests
+
+        /// <summary> Tests NH-2500 defect </summary>
+        [Test]
+        [Ignore("NH-2500")]
+        public void TestNh2500()
+        {
+            CreateTwoLangProduct();
+
+            using (var session = SessionFactory.Create())
+            {
+                var product = session.AsQueryable<Product>()
+                    .SingleOrDefault(p => p.Name.ToString(CultureInfo.GetCultureInfo("zh-CHS")) == ProductNameEn);
+
+                Assert.IsNotNull(product);
+                Assert.AreEqual(ProductCode, product.Code);
+            }
+
+            using (var session = SessionFactory.Create())
+            {
+                var product = session.AsQueryable<Product>()
+                    .SingleOrDefault(p => p.Name.ToString(CultureInfo.GetCultureInfo("ru-RU")) == ProductNameEn);
+
+                // The next line throws AssertionException
+                Assert.IsNull(product);
+            }
+        }
+
+        #endregion
     }
 }

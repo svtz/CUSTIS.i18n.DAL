@@ -17,7 +17,7 @@ namespace CUSTIS.I18N.DAL
     /// </summary>
     /// <remarks>
     /// Based on an article https://www.codeproject.com/Articles/15639/XMLFormatter-provider-for-serialization
-    /// The class calls the methods of ISerializable on the object if the object
+    /// The class calls the methods of <see cref="ISerializable"/> on the object if the object
     /// supports this interface. If not, the class will use Reflection to examine the public
     /// fields and properties of the object.<br/>
     /// When adding objects that inherit or implement IList, ICollection, the 

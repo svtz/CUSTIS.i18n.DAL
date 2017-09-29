@@ -1,7 +1,6 @@
-﻿using System.Globalization;
-using CUSTIS.I18N.DAL.EF;
-using CUSTIS.I18N.DAL.EF.Linq;
+﻿using CUSTIS.I18N.DAL.EF.Linq;
 using Microsoft.EntityFrameworkCore;
+using System.Globalization;
 
 namespace CUSTIS.I18N.SampleDomainModel.DAL.EF
 {

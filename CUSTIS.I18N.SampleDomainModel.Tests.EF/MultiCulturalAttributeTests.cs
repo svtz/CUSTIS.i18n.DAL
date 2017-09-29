@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Configuration;
 using System.Linq;
-using CUSTIS.I18N.DAL.EF;
 using CUSTIS.I18N.DAL.EF.Linq;
 using CUSTIS.I18N.SampleDomainModel.DAL.EF;
 using CUSTIS.I18N.SampleDomainModel.DAL.Tests;
@@ -259,6 +258,5 @@ namespace CUSTIS.I18N.SampleDomainModel.Tests.EF
         }
 
         #endregion
-
     }
 }

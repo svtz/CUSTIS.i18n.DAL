@@ -254,20 +254,20 @@ namespace CUSTIS.I18N.SampleDomainModel.DAL.Tests
 
         #region Helper Methods
 
-        protected void CreateTwoLangProduct()
+protected void CreateTwoLangProduct()
+{
+    using (var session = SessionFactory.Create())
+    {
+        var product = new TProduct
         {
-            using (var session = SessionFactory.Create())
-            {
-                var product = new TProduct
-                {
-                    Code = ProductCode,
-                    Name = new MultiCulturalString(ru, ProductNameRu)
-                        .SetLocalizedString(en, ProductNameEn)
-                };
+            Code = ProductCode,
+            Name = new MultiCulturalString(ru, ProductNameRu)
+                .SetLocalizedString(en, ProductNameEn)
+        };
 
-                session.Add(product);
-            }
-        }
+        session.Add(product);
+    }
+}
 
         protected abstract void TestFilterByMultiCulturalAttr_ToString_WhenEn_Impl();
 
