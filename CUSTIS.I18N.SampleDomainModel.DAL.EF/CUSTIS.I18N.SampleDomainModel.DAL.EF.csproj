@@ -1,42 +1,29 @@
-<Project Sdk="Microsoft.NET.Sdk">
-
+﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
     <PackageProjectUrl>https://github.com/CUSTIS-public/CUSTIS.i18n.DAL</PackageProjectUrl>
   </PropertyGroup>
-  
   <PropertyGroup>
     <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
   </PropertyGroup>
-  
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
     <DocumentationFile>bin\Debug\netstandard2.0\CUSTIS.I18N.SampleDomainModel.DAL.EF.xml</DocumentationFile>
   </PropertyGroup>
-  
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
     <DocumentationFile>bin\Release\netstandard2.0\CUSTIS.I18N.SampleDomainModel.DAL.EF.xml</DocumentationFile>
   </PropertyGroup>
-  
   <ItemGroup>
     <Compile Include="..\ProductInfo.cs" Link="Properties\ProductInfo.cs" />
   </ItemGroup>
-  
   <ItemGroup>
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="2.0.0" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="2.0.0" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="2.0.0" />
   </ItemGroup>
-  
   <ItemGroup>
     <ProjectReference Include="..\CUSTIS.I18N.DAL.EF\CUSTIS.I18N.DAL.EF.csproj" />
     <ProjectReference Include="..\CUSTIS.I18N.DAL\CUSTIS.I18N.DAL.csproj" />
     <ProjectReference Include="..\CUSTIS.I18N.SampleDomainModel\CUSTIS.I18N.SampleDomainModel.csproj" />
     <ProjectReference Include="..\CUSTIS.I18N\CUSTIS.I18N\CUSTIS.I18N.netstandard.csproj" />
   </ItemGroup>
-  
-  <ItemGroup>
-    <Reference Include="Microsoft.EntityFrameworkCore.SqlServer">
-      <HintPath>C:\Users\viofe\.nuget\packages\microsoft.entityframeworkcore.sqlserver\2.0.0\lib\netstandard2.0\Microsoft.EntityFrameworkCore.SqlServer.dll</HintPath>
-    </Reference>
-  </ItemGroup>
-
 </Project>
